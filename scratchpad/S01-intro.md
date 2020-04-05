@@ -65,6 +65,25 @@ we can write very concise code with almost no type annotations, but still benefi
 > Note: Check the handbook at the `assets/ch01_typescript_jumpstart_handbook.pdf`
 
 ## Environment Setup
+
+### Installation pre-requisites ###
+- Node over v12
+- Angular CLI
+- An IDE
+
+### Relevant commands ###
+To run the development backend server execute:
+
+    npm run server
+    
+This is a small Node REST API server.
+
+To run the development UI server execute:
+
+    npm start
+
+The application is visible at port 4200: http://localhost:4200
+
 ## Understanding RxJs - What are Streams?
 ## What is RxJs? What Problem Does It Solve?
 ## What is an RxJs Observable? A Simple Explanation 

@@ -1,8 +1,8 @@
-* TODO [3/9] Chapter 1: Introduction to RxJs
+* TODO [4/9] Chapter 1: Introduction to RxJs
   - [X] RxJs In Practice Course Helicopter View
   - [X] Recommended Software Versions
   - [X] The TypeScript Jumpstart Ebook
-  - [ ] Environment Setup
+  - [X] Environment Setup
   - [ ] Understanding RxJs - What are Streams?
   - [ ] What is RxJs? What Problem Does It Solve?
   - [ ] What is an RxJs Observable? A Simple Explanation 
