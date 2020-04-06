@@ -85,6 +85,41 @@ To run the development UI server execute:
 The application is visible at port 4200: http://localhost:4200
 
 ## Understanding RxJs - What are Streams?
+Before to start with observables it is important understand the notion of a stream of values. 
+
+In a web application often we have asynchronous request coming from the network bringing new values from the back-end. Additionally we have timeouts occurring in the front-end when we have user interaction reflected in events (e.g the click event). The combination of those asynchronous tasks are necessary to produce the final result of our program.
+
+A stream is basically a sequence of data values over time, this can range from a simple increment of number printed in 6 seconds (0, 1, 2, 3, 4, 5), or coordinates printed over time, and even the data value of inputs in a form. These all represent data values will be collected over the time, hence the name stream.
+
+Next we will share you three example. The first one is and stream of values that collect the click event when a user click over any place in a web page:
+
+```js
+document.addEventListener('click', event => {
+   console.log(event) // output: [MouseEvent{}, MouseEvent{}, MouseEvent{}, ...]
+})
+```
+
+The second one use the `setInterval` method of an API to print a the increment of a counter each second:
+
+```js
+let counter = 0;
+
+setInterval(() => {
+    console.log(counter); // output: [1, 2, 3, 4, ...]
+    counter++;
+}, 1000)
+```
+
+The last one use the `setTimeout` method of an API to print `finished...` after three seconds:
+
+```js
+setInterval(() => {
+    console.log("finished..."); // finished...
+}, 3000)
+```
+
+Here we got that in the first and the second example the stream have multiple values and they can continue to emit values over the time, so they will never complete. In the third example, the stream have just one values and is completed after three seconds.
+
 ## What is RxJs? What Problem Does It Solve?
 ## What is an RxJs Observable? A Simple Explanation 
 ## Core RxJs Concepts -Errors, Completion and Subscriptions
