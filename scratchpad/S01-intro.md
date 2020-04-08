@@ -146,6 +146,27 @@ We combine our stream values and our program behaves as we expect, but, we fall 
 
 RxJs that stands for reactive extensions for JavaScript, is a library that makes it very simple to combine stream of values together in a maintainable way.
 
-## What is an RxJs Observable? A Simple Explanation 
+## What is an RxJs Observable? A Simple Explanation
+Streams are important to understand because they are facilitated by RxJS Observables. An Observable is basically a function that can return a stream of values to an observer over time, this can either be synchronously or asynchronously. The data values returned can go from zero to an infinite range of values.
+
+So, to continue with this explanation, let's use the stream of values that we define in vanilla JavaScript before, and we start to use the methods of the RxJs library, as shown next:
+
+```js
+import { fromEvent, timer, interval } from 'rxjs'
+
+const interval$ = interval(1000);
+interval$.subscribe(value => console.log(`Interval Stream: ${value}`));
+
+const timer$ = timer(3000, 1000);
+timer$.subscribe(value => console.log(`Timer Stream: ${value}`));
+
+const click$ = fromEvent(document, 'click');
+click$.subscribe(event => console.log(event));
+```
+
+First of all, check that the `fromEvent`, `timer`, and `interval` are methods from RxJs that are equivalent to `addEventListener`, `setTimeout` and `setInterval` respectively.
+
+Here, it is important highlight that the `$` at the end of the variable name is a convention to indicate the observable. In this first assignation we are _defining_ a stream of values. In the vanilla example, we are instancing the stream of values directly. To instance the stream of values we have to use the `subscribe` method of an RxJs Observable.
+
 ## Core RxJs Concepts -Errors, Completion and Subscriptions
 ## Learn How Observables Work Under the Hood
