@@ -95,7 +95,7 @@ Next we will share you three example. The first one is and stream of values that
 
 ```js
 document.addEventListener('click', event => {
-   console.log(event) // output: [MouseEvent{}, MouseEvent{}, MouseEvent{}, ...]
+    console.log(event); // output: [MouseEvent{}, MouseEvent{}, MouseEvent{}, ...]
 })
 ```
 
@@ -113,7 +113,7 @@ setInterval(() => {
 The last one use the `setTimeout` method of an API to print `finished...` after three seconds:
 
 ```js
-setInterval(() => {
+setTimeout(() => {
     console.log("finished..."); // finished...
 }, 3000)
 ```
@@ -121,6 +121,31 @@ setInterval(() => {
 Here we got that in the first and the second example the stream have multiple values and they can continue to emit values over the time, so they will never complete. In the third example, the stream have just one values and is completed after three seconds.
 
 ## What is RxJs? What Problem Does It Solve?
+RxJS is a framework for reactive programming that makes use of Observables, making it really easy to write asynchronous code.
+
+So, to understand this definition let's to combine our three stream values with the next sequence: After the user clicks on the page, we will trigger the `setTimeout` function and then we execute the `setInterval` stream. To achieve this in JavaScript we should nest the order via callbacks as we show below:
+
+```js
+document.addEventListener('click', event => {
+    console.log(event) // output: [MouseEvent{}, MouseEvent{}, MouseEvent{}, ...]
+
+    setTimeout(() => {
+      console.log("finished..."); // finished...
+
+      let counter = 0;
+
+      setInterval(() => {
+          console.log(counter); // output: [1, 2, 3, 4, ...]
+          counter++;
+      }, 1000);
+    }, 3000);
+});
+```
+
+We combine our stream values and our program behaves as we expect, but, we fall in a common problem in JavaScript that is called the callback hell. The callback hell issue makes that the programs will hard to understand and complicated to maintain. Here, RxJs came to the rescue.
+
+RxJs that stands for reactive extensions for JavaScript, is a library that makes it very simple to combine stream of values together in a maintainable way.
+
 ## What is an RxJs Observable? A Simple Explanation 
 ## Core RxJs Concepts -Errors, Completion and Subscriptions
 ## Learn How Observables Work Under the Hood
