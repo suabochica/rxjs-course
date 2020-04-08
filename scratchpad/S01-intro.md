@@ -168,5 +168,35 @@ First of all, check that the `fromEvent`, `timer`, and `interval` are methods fr
 
 Here, it is important highlight that the `$` at the end of the variable name is a convention to indicate the observable. In this first assignation we are _defining_ a stream of values. In the vanilla example, we are instancing the stream of values directly. To instance the stream of values we have to use the `subscribe` method of an RxJs Observable.
 
-## Core RxJs Concepts -Errors, Completion and Subscriptions
+## Core RxJs Concepts - Errors, Completion and Subscriptions
+To explore the RxJs core concepts we should dive in the `subscribe` methods. By definition, the `subscribe` methods can receive three parameters:
+
+1. A callback function to handle the `next` (emit) scenario
+1. A callback function to handle the `error` scenario
+1. A callback function to handle the `complete` scenario
+
+So let's bolster our `fromEvent` subscription:
+
+```js
+const click$ = fromEvent(document, 'click');
+click$.subscribe(
+    event => console.log(event),
+    error => console.log(error),
+    () => console.log("completed")
+);
+```
+
+Now we include a logic for the error handling and the complete scenario for our `fromEvent` observable.  An important aspect is that the error and complete scenario are exclusive. If one is executed the stream will not emit values.
+
+Another important notion in what concerns observables is the notion of subscription and cancellation. For example, if for the `timer$` observable we want to unsubscribe it after five seconds and no long handle the values it might emitting, we can use the next approach.
+
+```js
+const timer$ = timer(3000, 1000);
+timer$.subscribe(value => console.log(`Timer Stream: ${value}`));
+
+setTimeout(() => timer$.unsubscribe(), 5000)
+```
+
+As we can see, RxJs offer the `unsubscribe` method for observable to cancel the subscription from the stream of values.
+
 ## Learn How Observables Work Under the Hood
