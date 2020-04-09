@@ -200,3 +200,46 @@ setTimeout(() => timer$.unsubscribe(), 5000)
 As we can see, RxJs offer the `unsubscribe` method for observable to cancel the subscription from the stream of values.
 
 ## Learn How Observables Work Under the Hood
+To check how observables work under the Hood, let's check a practical example of a HTTP stream. Before to start, please check that your back-end server is up getting an response from the next URL:
+
+```
+http://localhost:9000/api/courses
+```
+
+Once this endpoint is giving us a response let's create an observable over our HTTP request, as shown below:
+
+```js
+const httpCourse$ = Observable.create(observer => {
+  fetch('/api/courses')
+    .then(response => {
+      return response.json();
+    })
+    .then(body => {
+      observer.next(body);
+      observer.complete();
+    })
+    .catch(err => {
+      observer.error(err);
+    });
+});
+```
+
+First of all, notice the `Observable.create` method. This is the explicit way of create an observable from scratch and this method is called in the by the `fromEvent`, `interval` and `timer` methods that we used before.
+
+Second thing, this function takes one parameter which is known as the `observer`. The `observer` is what is going to allow us to emit new values, handling the error or the complete scenario of the observable.
+
+At this point in the body of the function that we pass to the `create` method, we use the Fetch API to get the response of our `.api/course` endpoint. Remember that the `fetch` function returns a promise. In our first `.then` we get the body of the response. In the second `.then` we pass this body to the `next` method of the observer to emit the value and later we notify that the observable is complete. Additionally in the `.catch` function we handle any possible error.
+
+The current code is just the definition of the stream of values. We precise a subscription to instantiate the observable, as shown below:
+
+```json
+httpCourses$.subscribe(
+  courses => console.log(courses),
+  noop,
+  () => console.log('completed')
+);
+```
+
+Now, if we check the browser console we will get the object with the response of the courses endpoint. Also, note that we use the three parameters of the `subscribe` method to validate each of the respective scenarios.
+
+Finally you will ask yourself why we transform the `fetch` promise into an observable, if we got our data as expected. The main advantage is that now, we can use all the RxJs operators to easily combine our HTTP stream with other streams of values such as click handlers or timeouts. Let's dive down in the next section the different operators the RxJs offer us.
