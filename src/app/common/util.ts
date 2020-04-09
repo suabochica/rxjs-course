@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 
-export const createHttpCoursesObservable = (url: string) => {
-  Observable.create(observer => {
+export function createHttpCoursesObservable(url: string) {
+  return Observable.create(observer => {
     fetch(url)
       .then(response => {
         return response.json();
@@ -15,3 +15,5 @@ export const createHttpCoursesObservable = (url: string) => {
       });
   });
 }
+
+export function noop() { }

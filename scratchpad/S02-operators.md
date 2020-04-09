@@ -64,6 +64,54 @@ So, let's go in detail we the last code. First we use the `.pipe` method to shap
 Finally, we `subscribe` to the `courses$` observable to print in the log the generated array.
 
 ## Building Components with RxJs - Imperative Design
+Let's split our courses array in the beginner and advanced categories. We can do the separation in the `subscribe` method of the `courses$` observable, as shown below.
+
+```js
+export class HomeComponent implements OnInit {
+  beginnerCourses: Course[];
+  advancedCourses: Course[];
+
+  ngOnInit() {
+    const httpCourses$ = createHttpCoursesObservable('/api/courses');
+    const courses$ = httpCourses$
+      .pipe(
+        map(response => Object.values(response["payload"]))
+      );
+
+    courses$.subscribe(
+      courses => {
+        this.beginnerCourses = courses.filter(course => course.category === 'BEGINNER');
+        this.advancedCourses = courses.filter(course => course.category === 'ADVANCED');
+      },
+      noop,
+      () => console.log('completed')
+    );
+  }
+}
+```
+
+Notice that we are using the `.filter` method of the native JavaScript Array (not the RxJs operator). We store the courses in their respective variables, and how they are defined in the scope of the component we can use them in the `html` file of it;
+
+```html
+<div class="courses-panel">
+    <h3>All Courses</h3>
+    <mat-tab-group>
+        <mat-tab label="Beginners">
+            <courses-card-list
+                    [courses]="beginnerCourses">
+            </courses-card-list>
+        </mat-tab>
+        <mat-tab label="Advanced">
+            <courses-card-list
+                    [courses]="advancedCourses"
+            ></courses-card-list>
+        </mat-tab>
+    </mat-tab-group>
+</div>
+```
+
+Now our component render the courses information as expected but this approach have some details. The problem with having the logic inside the `subscribe` call, is that our code will not be scale easily. One of the purpose of use RxJs is avoid callbacks, and putting this logic in the `subscribe` method goes against this principle. This approach is considered imperative, because we save the logic inside the `subscribe` call that is attending more responsibilities that the subscription.
+
 ## Building Components with RxJs - Reactive Design
 ## Sharing HTTP Responses with the shareReplay Operator
 ## RxJs Higher-Order Mapping Operators
