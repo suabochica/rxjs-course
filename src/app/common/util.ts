@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 
-export function createHttpCoursesObservable(url: string) {
+export function createHttpObservable(url: string) {
   return Observable.create(observer => {
     fetch(url)
       .then(response => {
