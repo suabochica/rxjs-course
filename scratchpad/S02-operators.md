@@ -115,30 +115,6 @@ Now our component render the courses information as expected but this approach h
 ## Building Components with RxJs - Reactive Design
 The goal here is to refactor our component in order to have it use a reactive design instead. So, for the imperative version we just define one stream of data courses, and then we subscribe to it and extract the respective data. Let's change this approach creating to streams of data, one for the beginner courses and the other to the advanced courses, as shown below:
 
-```js
-export class HomeComponent implements OnInit {
-  beginnerCourses$: Observable<Course[]>;
-  advancedCourses$: Observable<Course[]>;
-
-  ngOnInit() {
-    const httpCourses$: Observable<Course[]> = createHttpObservable('/api/courses');
-    const courses$ = httpCourses$
-      .pipe(
-        map(response => Object.values(response["payload"]))
-      );
-
-    this.beginnerCourses$ = courses$
-      .pipe(
-        map(courses => courses.filter(course => course.category === 'BEGINNER'))
-      );
-
-    this.advancedCourses$ = courses$
-      .pipe(
-        map(courses => courses.filter(course => course.category === 'ADVANCED'))
-      );
-  }
-}
-```
 Notice that our observables are of type `<Course[]>`. Wit our observables available, we can start to use the RxJs operators on it and get the array of courses split by category. Catch that we use the `.pipe` operator to start our sequence and the `.filter` to split the courses. Additionaly we use the native JavaScript `map` array to return the array of courses.
 
 Now, we should modify the markup to render the courses. Look at the next snippet.
@@ -167,6 +143,34 @@ The key change of this code is in the `[courses]="beginnerCourses$ | async"` lin
 Now, our approach looks promising as it is more maintainable. We don't run into nested subscribe. However we would face other problems now, because we are fetching the data twice from back-end. Let's check the RxJs operator that will help us with this issue.
 
 ## Sharing HTTP Responses with the shareReplay Operator
+With the reactive design approach implemented, now we are facing the problem of send two request to retrieve the same data. If you check your _Network_ tab in the developer tools of the browser you will see two GET calls to the `courses` endpoints. If in our code we add another call to the `courses$` observable, like `courses$.subscribe()`, then we the _Network_ call will record three calls to the `courses` endpoint. The next code will allow as to just send one call to the endpoint.
+
+```js
+ngOnInit() {
+  const httpCourses$: Observable<Course[]> = createHttpObservable('/api/courses');
+  const courses$ = httpCourses$
+    .pipe(
+      tap(() => console.log("HTTP request")),
+      map(response => Object.values(response["payload"])),
+      shareReplay()
+    );
+
+  this.beginnerCourses$ = courses$
+    .pipe(
+      map(courses => courses.filter(course => course.category === 'BEGINNER'))
+    );
+
+  this.advancedCourses$ = courses$
+    .pipe(
+      map(courses => courses.filter(course => course.category === 'ADVANCED'))
+    );
+}
+```
+
+Here is important to highlight the `shareReplay` operator. This operator makes that the stream be executed only once and then the result of that stream will be replayed to each new subscriber. This definition grant to us that our HTTP response is going to be passed on to new each subscription.
+
+Another key detail of the last code is the use of the `tap` operator. This operator able to us introduce side effects in the observable chain for use the helpful `console.log()` to check the execution code of our code.
+
 ## RxJs Higher-Order Mapping Operators
 ## Observable Concatenation
 ## From Draft Pre-Save Example and the RxJs Filter Operator
