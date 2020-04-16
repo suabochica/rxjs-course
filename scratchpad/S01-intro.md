@@ -62,7 +62,7 @@ If you are afraid that using Typescript means a lot of ceremony and verbosity fo
 
 we can write very concise code with almost no type annotations, but still benefit from all the tooling like auto-completion and refactoring working out-of-the-box.
 
-> Note: Check the handbook at the `assets/ch01_typescript_jumpstart_handbook.pdf`
+> Note: Check the handbook at the `assets/s01-typescript_jumpstart_handbook.pdf`
 
 ## Environment Setup
 
