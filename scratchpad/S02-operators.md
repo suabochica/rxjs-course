@@ -412,7 +412,7 @@ In the nested subscribes example, we are actually triggering the save operations
 
 
 ### How to choose the right mapping Operator? ###
-The behavior of concatMap, mergeMap, switchMap and exhaustMap is similar in the sense they are all higher order mapping operators. But its also so different in so many subtle ways, that there isn't really one operator that can be safely pointed to as a default.
+The behavior of `concatMap`, `mergeMap`, `switchMap` and `exhaustMap` is similar in the sense they are all higher order mapping operators. But its also so different in so many subtle ways, that there isn't really one operator that can be safely pointed to as a default.
 
 Instead, we can simply choose the appropriate operator based on the use case:
 
@@ -433,6 +433,35 @@ Choosing the right operator is all about choosing the right inner Observable com
 > Note: Check the handbook at the `assets/s02-exjs_high_order_mapping_operators.pdf`
 
 ## Observable Concatenation
+The explain the notion of the observable concatenation lets use the next code as references.
+
+```js
+ngOnInit() {
+  const source1$ = of(1, 2, 3);
+  const source2$ = of(4, 5, 6);
+  const source3$ = of(7, 8, 9);
+
+  const result$ = concat(source1$, source2$, source3$); // 1, 2, 3, 4, 5, 6, 7 ,8, 9
+  result$.subscribe(console.log);
+};
+```
+
+So in this code, we define three observables like sources and one as the result of the concatenation. Time to go deep with the information that is relevant to the `concat` operator. First of all, to concatenate the sources observables, we should have to guarantee that these observables are complete. Just under this rule, we can subscribe to the another observable. Therefore if we compile the next code:
+
+```js
+ngOnInit() {
+  const source1$ = interval(100);
+  const source2$ = of(4, 5, 6);
+  const source3$ = of(7, 8, 9);
+
+  const result$ = concat(source1$, source2$, source3$); // 1, 2, 3, 4, 5, 6, 7 ,8, 9
+  result$.subscribe(console.log);
+};
+
+```
+
+The `source2$` and the `source3$` never will be concatenated to the `result$` observable. Second, remember call the `subscribe` method in the `result$` observable to instance it. for the sources observables the subscriptions occurs under the `concat` method.
+
 ## From Draft Pre-Save Example and the RxJs Filter Operator
 ## The RxJs concatMap Operator
 ## Understanding the Merge Observable Combination Strategy
