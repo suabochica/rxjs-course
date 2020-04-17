@@ -463,6 +463,43 @@ ngOnInit() {
 The `source2$` and the `source3$` never will be concatenated to the `result$` observable. Second, remember call the `subscribe` method in the `result$` observable to instance it. for the sources observables the subscriptions occurs under the `concat` method.
 
 ## From Draft Pre-Save Example and the RxJs Filter Operator
+Here we are going to cover a possible use case of the observable concatenation and the `filter` operator. To illustrates these concepts we will use the next example: In the course dialog component, we have a simple form to edit the fields that are relevant for a course —name, category, and description—. All the changes on the form will be a stream of values, and the HTTP PUT request to update the information of the course will be another.
+
+Our first approach will use the _nested subscribe anti-pattern_ and will look like:
+
+```js
+import {FormGroup} from "@angular/forms";
+
+...
+form: FormGroup;
+...
+
+ngOnInit() {
+  this.form.valueChanges
+    .pipe(
+      filter(() => this.form.valid)
+    )
+    .subscribe(changes => {
+      const saveCourses$ = fromPromise(
+        fetch(`/api/courses/{$this.course.id}`),
+        {
+          method: 'PUT',
+          body: JSON.stringify(changes),
+          headers: {
+            'content-type': 'application-json'
+          }
+        }
+      )
+
+      saveCourses$.subscribe();
+    });
+}
+```
+
+Several important thing in this code. The first one is that the observable `this.form.valuesChanges` is provided by angular. The second item is that we use the `filter` operator to keep the forms that are valid. For other side, after subscribe to the `this.form.ValueChanges` observable we use the `fromPromise` operator of RxJs to convert the promise returned by `fethc` into an observable. Finally we have to subscribe it to the definition of the `saveCourses$` observable to instance it. 
+
+This solution works, but follow the _nested subscribe anti-pattern_. Also, if you check the Network tab of your developer tools, you will see that every time that you modify the form, we are sending the PUT request. Let's check how to fix it in the next section.
+
 ## The RxJs concatMap Operator
 ## Understanding the Merge Observable Combination Strategy
 ## The RxJs mergeMap Operator

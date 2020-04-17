@@ -12,13 +12,12 @@ import {fromPromise} from 'rxjs/internal-compatibility';
     templateUrl: './course-dialog.component.html',
     styleUrls: ['./course-dialog.component.css']
 })
-export class CourseDialogComponent implements OnInit, AfterViewInit {
 
+export class CourseDialogComponent implements OnInit, AfterViewInit {
     form: FormGroup;
-    course:Course;
+    course: Course;
 
     @ViewChild('saveButton', { static: true }) saveButton: ElementRef;
-
     @ViewChild('searchInput', { static: true }) searchInput : ElementRef;
 
     constructor(
@@ -34,26 +33,35 @@ export class CourseDialogComponent implements OnInit, AfterViewInit {
             releasedAt: [moment(), Validators.required],
             longDescription: [course.longDescription,Validators.required]
         });
-
     }
 
     ngOnInit() {
+      this.form.valueChanges
+        .pipe(
+          filter(() => this.form.valid)
+        )
+        .subscribe(changes => {
+          const saveCourses$ = fromPromise(
+            fetch(`/api/courses/{$this.course.id}`),
+            {
+              method: 'PUT',
+              body: JSON.stringify(changes),
+              headers: {
+                'content-type': 'application-json'
+              }
+            }
+          )
 
-
-
+          saveCourses$.subscribe();
+        });
     }
-
-
 
     ngAfterViewInit() {
 
 
     }
 
-
-
     close() {
         this.dialogRef.close();
     }
-
 }
