@@ -1,7 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { noop, pipe } from 'rxjs';
-
-import { createHttpCoursesObservable } from '../common/util'
+import { noop, concat, pipe, of } from 'rxjs';
 
 @Component({
   selector: 'about',

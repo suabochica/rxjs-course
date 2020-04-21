@@ -1,21 +1,22 @@
-* TODO [4/9] Chapter 1: Introduction to RxJs
+* DONE [9/9] Chapter 1: Introduction to RxJs
+  CLOSED: [2020-04-20 Mon 19:54]
   - [X] RxJs In Practice Course Helicopter View
   - [X] Recommended Software Versions
   - [X] The TypeScript Jumpstart Ebook
   - [X] Environment Setup
-  - [ ] Understanding RxJs - What are Streams?
-  - [ ] What is RxJs? What Problem Does It Solve?
-  - [ ] What is an RxJs Observable? A Simple Explanation 
-  - [ ] Core RxJs Concepts -Errors, Completion and Subscriptions
-  - [ ] Learn How Observables Work Under the Hood
-* TODO [/] Chapter 2: Essential RxJs Operators + Reactive Design
-  - [ ] What are RxJs Oprators?
-  - [ ] Building Components with RxJs - Imperative Design
-  - [ ] Building Components with RxJs - Reactive Design
-  - [ ] Sharing HTTP Responses with the shareReplay Operator
-  - [ ] RxJs Higher-Order Mapping Operators
-  - [ ] Observable Concatenation
-  - [ ] From Draft Pre-Save Example and the RxJs Filter Operator
+  - [X] Understanding RxJs - What are Streams?
+  - [X] What is RxJs? What Problem Does It Solve?
+  - [X] What is an RxJs Observable? A Simple Explanation
+  - [X] Core RxJs Concepts -Errors, Completion and Subscriptions
+  - [X] Learn How Observables Work Under the Hood
+* TODO [7/15] Chapter 2: Essential RxJs Operators + Reactive Design
+  - [X] What are RxJs Oprators?
+  - [X] Building Components with RxJs - Imperative Design
+  - [X] Building Components with RxJs - Reactive Design
+  - [X] Sharing HTTP Responses with the shareReplay Operator
+  - [X] RxJs Higher-Order Mapping Operators
+  - [X] Observable Concatenation
+  - [X] From Draft Pre-Save Example and the RxJs Filter Operator
   - [ ] The RxJs concatMap Operator
   - [ ] Understanding the Merge Observable Combination Strategy
   - [ ] The RxJs mergeMap Operator

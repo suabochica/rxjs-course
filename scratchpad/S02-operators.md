@@ -501,6 +501,41 @@ Several important thing in this code. The first one is that the observable `this
 This solution works, but follow the _nested subscribe anti-pattern_. Also, if you check the Network tab of your developer tools, you will see that every time that you modify the form, we are sending the PUT request. Let's check how to fix it in the next section.
 
 ## The RxJs concatMap Operator
+Concatenation is ideally suited for safe operations and when these operations happen in the same order as the values are emitted. To start to organize our code, first we will to take the logic of the `fromPromise `observable and save it in a new method called `saveCourse`. This method will receive just one parameter, the stream values of the changes that the user is making in the form. The next code shows the mentioned split. 
+
+```ts
+ngOnInit() {
+  this.form.valueChanges
+    .pipe(
+      filter(() => this.form.valid)
+      concatMap(changes => this.saveCourse(changes))
+    )
+    .subscribe();
+}
+
+saveCourse(changes) {
+  return fromPromise(
+    fetch(`/api/courses/{$this.course.id}`,
+    {
+      method: 'PUT',
+      body: JSON.stringify(changes),
+      headers: {
+        'content-type': 'application-json'
+      }
+    }
+    )
+  );
+}
+```
+
+Now, let's dive in the definition of `concatMap`. And important rule of the `concatMap` is that it will take the values of the source observable and for each values will create a new safe observable. Then it will concatenate all those derive observables together in order to make sure that the safe operations are done in the right order.
+
+In summary, the `concatMap` higher-order operation map values to inner observable, subscribe and emit then in order. Notice that the operator do the subscriptions of his observables internally.
+
+In our case, we use the `concatMap` operator after filter the valid forms, passing the values changes and returning the `saveCourses` observable. You can check how works this implementation in the Network tab of the developer tools.
+
+- [concatMap Documentation](https://rxjs.dev/api/operators/concatMap)
+
 ## Understanding the Merge Observable Combination Strategy
 ## The RxJs mergeMap Operator
 ## The RxJs exhaustMap Operator
