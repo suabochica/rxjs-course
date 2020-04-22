@@ -554,6 +554,39 @@ In this code, we have two input observables: `interval1$` that emit a value each
 - [merge Documentation](https://rxjs.dev/api/index/function/merge)
 
 ## The RxJs mergeMap Operator
+The `mergeMap` operator share the same principle of the `concatMap` operator. We will operate over the source observable, and we are going to apply a mapping function that will take the value to produce a new observable. The difference with `concatMap` is that instead of wait until the source observable be completed to start with the second observable, the `mergeMap` will map the values of the second observable as it find them. In other words, it will operate in *parallel* the mapping function. Let's check the notion of `mergeMap` with an example:
+
+
+```ts
+ngOnInit() {
+  this.form.valueChanges
+    .pipe(
+      filter(() => this.form.valid)
+      mergeMap(changes => this.saveCourse(changes))
+    )
+    .subscribe();
+}
+
+saveCourse(changes) {
+  return fromPromise(
+    fetch(`/api/courses/{$this.course.id}`,
+    {
+      method: 'PUT',
+      body: JSON.stringify(changes),
+      headers: {
+        'content-type': 'application-json'
+      }
+    })
+  );
+}
+```
+
+The above code replace the `concatMap` by `mergeMap` at the moment to send our PUT request when the user edit the form. If you check in the network tab, every time that the user changes the form, a request will be emitted, because the mapping function is executed as values are found, no matters if belongs to a different source observable.
+
+For the user form changes, it is suitable send the request in sequence, it is for that reason that the `concatMap` operator is the appropriate to guarantee the expected behavior. For more information about the `mergeMap` operator, please visit the official documentation.
+
+- [mergeMap Documentation](https://rxjs.dev/api/operators/mergeMap)
+
 ## The RxJs exhaustMap Operator
 ## Unsubscription in Detail
 ## Setting Up the Course Component
