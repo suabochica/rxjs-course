@@ -537,6 +537,22 @@ In our case, we use the `concatMap` operator after filter the valid forms, passi
 - [concatMap Documentation](https://rxjs.dev/api/operators/concatMap)
 
 ## Understanding the Merge Observable Combination Strategy
+By definition the `merge` operator creates an output observable which concurrently emits all values from every given input observable. To illustrate this notion, lets evaluate the next snippet:
+
+```ts
+ngOnInit() {
+  const interval1$ = interval(1000);
+  const interval2$ = interval1$.pipe(map(val => 10 * val));
+
+  const result$ = merge(interval1$, interval2$);
+  result$.subscribe(console.log); // prints: 1, 10, 2, 20, 3, 30, ...
+};
+```
+
+In this code, we have two input observables: `interval1$` that emit a value each second and `interval2$` that takes the `interval1$` and via `map` multiplies the values by 10. In the `result$` observable, we use the `merge` operator to flat the values of the input observables by blending their values in the output observable. For more information about how this operators works, please visit the official documentation.
+
+- [merge Documentation](https://rxjs.dev/api/index/function/merge)
+
 ## The RxJs mergeMap Operator
 ## The RxJs exhaustMap Operator
 ## Unsubscription in Detail
