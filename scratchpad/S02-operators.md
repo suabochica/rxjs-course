@@ -588,6 +588,47 @@ For the user form changes, it is suitable send the request in sequence, it is fo
 - [mergeMap Documentation](https://rxjs.dev/api/operators/mergeMap)
 
 ## The RxJs exhaustMap Operator
+To explain the `exhaustMap` operator let's define a concrete example where it could be useful. In the edit course dialog we have there a save button. The goals is that whenever the user click on the save button we will trigger the `saveCourse` method that we have on the back-end.
+
+One common feature to implement in these cases is to prevent the user from hitting the save button multiple times sending multiple calls to the back-end. So in our context our markup will be like:
+
+```html
+<mat-dialog-actions>
+
+    <button class="mat-raised-button"
+            (click)="close()">
+        Close
+    </button>
+
+    <button class="mat-raised-button mat-primary" #saveButton>
+        Save
+    </button>
+
+</mat-dialog-actions>
+```
+
+Here it is important the `#saveButton` to send the element references in the DOM to the `.ts` file and retrieve the event button. The next snippet shows the content of the typescript file of the component:
+
+```ts
+
+    //--snippet--
+    
+    @ViewChild('saveButton', { static: true }) saveButton: ElementRef;
+
+    //...
+
+    ngAfterViewInit() {
+      fromEvent(this.saveButton.nativeElement, 'click')
+        .pipe(
+          exhaustMap(() => this.saveCourse(this.form.value));
+        )
+    }
+```
+
+The last snippet use the `fromEvent` to create the observable that will listen the `click` event on the save button. Then we open the `.pipe` method and finally the `exhaustMap` appears. By definition, the `exhaustMap` projects each source values to an Observable which is merge in the output observable only if the previous projected Observable has completed. The benefit that we gain with the `exhaustMap` is that the values after completed the output Observable will be ignored. This description is ideal for our save form button to avoid send the HTTP PUT request every time that the user clicks in the button.
+
+- [exhaustMap Documentation](https://rxjs.dev/api/operators/exhaustMap)
+
 ## Unsubscription in Detail
 ## Setting Up the Course Component
 ## Building a Search Typehead
