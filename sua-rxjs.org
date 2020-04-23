@@ -9,7 +9,7 @@
   - [X] What is an RxJs Observable? A Simple Explanation
   - [X] Core RxJs Concepts -Errors, Completion and Subscriptions
   - [X] Learn How Observables Work Under the Hood
-* TODO [10/15] Chapter 2: Essential RxJs Operators + Reactive Design
+* TODO [12/15] Chapter 2: Essential RxJs Operators + Reactive Design
   - [X] What are RxJs Oprators?
   - [X] Building Components with RxJs - Imperative Design
   - [X] Building Components with RxJs - Reactive Design
@@ -20,8 +20,8 @@
   - [X] The RxJs concatMap Operator
   - [X] Understanding the Merge Observable Combination Strategy
   - [X] The RxJs mergeMap Operator
-  - [ ] The RxJs exhaustMap Operator
-  - [ ] Unsubscription in Detail
+  - [X] The RxJs exhaustMap Operator
+  - [X] Unsubscription in Detail
   - [ ] Setting Up the Course Component
   - [ ] Building a Search Typehead
   - [ ] Finishing the Search Typehead

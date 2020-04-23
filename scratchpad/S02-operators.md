@@ -630,6 +630,51 @@ The last snippet use the `fromEvent` to create the observable that will listen t
 - [exhaustMap Documentation](https://rxjs.dev/api/operators/exhaustMap)
 
 ## Unsubscription in Detail
+The unsubscription feature of Observables, allow us to cancel the operations on the stream value. This scenario should be useful for a search feature where after the user types some character we cancel the subscription to retrieve the results. Let's introduce the unsubscription with the next example:
+
+```ts
+  const interval1$ = interval(1000);
+  const sub = interval1$.subscribe(console.log);
+
+  setTimeout(() => sub.unsubscribe(), 5000); // prints: 0, 1 ,2, 3, 4
+```
+
+In the last code, we use the `setTimeout` function to indicate that after five seconds, the unsubscription to the interval1$ Observable will be effective. That is the reason why in the console of the developer tools we see the log of the first five values that generate the observable.
+
+Let's follow the reviewed principle with a common case in web development: Cancel HTTP request. The next code is a variation of our `createHttpObservable` method in the `util.ts` file:
+
+```ts
+export function createHttpObservable(url: string) {
+  return Observable.create(observer => {
+    const controller = new AbortController()
+    const signal = controller.signal;
+
+    fetch(url, { signal })
+      .then(response => {
+        return response.json();
+      })
+      .then(body => {
+        observer.next(body);
+        observer.complete();
+      })
+      .catch(err => {
+        observer.error(err);
+      });
+
+    return () => controller.abort();
+  });
+}
+```
+
+Here, we use the `AbortController` class provided by the Fetch API, retrieve the `signal` property of the `controller` that will be passed to the `fetch` method, and then we use the `abort()` method to cancel the request. Below show how to cancel the HTTP request once is triggered:
+
+```ts
+const http$ = createHttpObservable('/api/courses');
+const subHttp = http$.subscribe(console.log);
+
+setTimeout(() => subHttp.unsubscribe(), 0);
+```
+
 ## Setting Up the Course Component
 ## Building a Search Typehead
 ## Finishing the Search Typehead
