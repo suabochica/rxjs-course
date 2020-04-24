@@ -676,5 +676,92 @@ setTimeout(() => subHttp.unsubscribe(), 0);
 ```
 
 ## Setting Up the Course Component
+Before to continue with the `switchMap` operator, first let's set up an scenario where is enable a type search bar to find lessons of a course. The next code is on the `course.component.ts` file. The user can navigate to this view if click on the _view course_ button. The next code is the implementation to render the information of the course. 
+
+```ts
+export class CourseComponent implements OnInit, AfterViewInit {
+    course$: Observable<Course>;
+    lessons$: Observable<Lesson[]>;
+
+    @ViewChild('searchInput', { static: true }) input: ElementRef;
+
+    constructor(private route: ActivatedRoute) {
+
+    }
+
+    ngOnInit() {
+      const courseId = this.route.snapshot.params['id'];
+      this.course$ = createHttpObservable(`/api/courses/${courseId}`);
+      // --snip--
+    }
+
+    ngAfterViewInit() {
+
+    }
+}
+```
+
+Notice that the `course$` Observable is created with help of the `createHttpObservable` method from our `util.ts` file. Additionally, the request is send to the course endpoint with the `courseId` parameter, to bring the information of that particular course. This set up is consume in the next markup. 
+
+```html
+<div class="course">
+    <ng-container *ngIf="(course$ | async) as course">
+        <h2>{{course?.description}}</h2>
+        <img class="course-thumbnail" [src]="course?.iconUrl">
+    </ng-container>
+
+    <mat-form-field class="search-bar">
+        <input matInput placeholder="Type your search" #searchInput autocomplete="off">
+    </mat-form-field>
+
+    <!-- snip --/>
+</div>
+```
+
+As you can see, here we use again the `course$ | async` syntax to subscribe into the `course$` Observable. Then, with help of the optional operator `?`, the information of the course is displayed.
+
+Similarly, we follow the last logic for get the lessons of the course. below the code related to request the lessons endpoint in the `course.component.ts` file.
+
+```ts
+export class CourseComponent implements OnInit, AfterViewInit {
+    ngOnInit() {
+      // --snip--
+      this.lessons$ = createHttpObservable(`/api/lessons?courseId=${courseId}&pageSize=100`)
+        .pipe(
+          map(response => response["payload"])
+        );
+    }
+
+    ngAfterViewInit() {
+
+    }
+}
+```
+
+The additional step for lessons, is that we send the `pageSize` parameter to limit the quantity of lessons displayed in the page, andthe `map` for the `payload` property. Next, it is the markup for the lessons of the course.
+
+```html
+<div class="course">
+    <!-- snip --/>
+    <table class="lessons-table mat-elevation-z7" *ngIf="(lessons$ | async) as lessons">
+        <thead>
+            <th>#</th>
+            <th>Description</th>
+            <th>Duration</th>
+        </thead>
+
+        <tr *ngFor="let lesson of lessons">
+            <td class="seqno-cell">{{lesson.seqNo}}</td>
+            <td class="description-cell">{{lesson.description}}</td>
+            <td class="duration-cell">{{lesson.duration}}</td>
+        </tr>
+    </table>
+</div>
+```
+
+Again, we use the `lessons$ | async` syntax to subscribe into the observable, and we render the lessons information in a table.
+
+Now that we have the set up of our course lessons, let's dive in the `switchMap` operator to enable the search typehead feature.
+
 ## Building a Search Typehead
 ## Finishing the Search Typehead

@@ -53,8 +53,7 @@ export class CourseDialogComponent implements OnInit, AfterViewInit {
           headers: {
             'content-type': 'application-json'
           }
-        }
-        )
+        })
       );
     }
 
