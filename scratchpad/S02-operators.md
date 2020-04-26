@@ -764,4 +764,40 @@ Again, we use the `lessons$ | async` syntax to subscribe into the observable, an
 Now that we have the set up of our course lessons, let's dive in the `switchMap` operator to enable the search typehead feature.
 
 ## Building a Search Typehead
+To start or search type head feature, we will use an input file in the markup of our `course.component` to retrieve the typed keys to establish the search. The next code is a snippet of the `course.component.html` file that corresponds to the input field to receive the search.
+
+```html
+<!-- snip --/>
+    <mat-form-field class="search-bar">
+        <input matInput placeholder="Type your search" #searchInput autocomplete="off">
+    </mat-form-field>
+
+```
+
+Once this definition is ready we can consume it in the `course.component.ts` with help of the `@ViewChild` directive of angular as shown below.
+
+```ts
+@ViewChild('searchInput', { static: true }) input: ElementRef;
+
+// -- snip ---
+
+ngAfterViewInit() {
+  fromEvent<any>(this.input.nativeElement, 'keyup')
+    .pipe(
+      map(event => event.target.value),
+      debounceTime(400),
+      distinctUntilChanged()
+    ).
+    subscribe(console.log);
+}
+```
+
+Finally in our `ngAfterViewInit` we set the logic to create an Observable from the `keyup` event that get the search input. First we map our data to retrieve the respective value of the event, in this cases the character key.
+
+Second, we use the `debounceTime` operator to set stability in the values of the streams. If you log the Observable without the `debounceTime` operator, you will see duplicated values and also all the typed characters. This behavior is not the expected because the each log represent a request to our backend. Then the `debounceTime` operator allow us to emit a value from the source Observable only after a particular time span has passed without another source emission.
+
+Lastly, we use the `distinctUntilChanged` operator to validate that the emitted items by the source Observable are distinct by comparison from the previous item. This way we avoid the duplicated values that the Observable can record.
+
+Now we have the basis to send the request of the search. Time to see what would be the best operator to this cases. The previous higher map operators are not a good choice, the give us a clue to check the `switchMap` operator.
+
 ## Finishing the Search Typehead
