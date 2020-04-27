@@ -26,8 +26,8 @@
   - [X] Setting Up the Course Component
   - [X] Building a Search Typehead
   - [X] Finishing the Search Typehead
-* TODO [/] Chapter 3: RxJs Error Handling
-  - [ ] RxJs Error Handling Guide
+* TODO [1/6] Chapter 3: RxJs Error Handling
+  - [X] RxJs Error Handling Guide
   - [ ] RxJs Error Handling - The Catch and Replace Error Handling Strategy
   - [ ] The Catch and Rethrow RxJs Error Handling Strategy
   - [ ] The Retry RxJs Error Handling Strategy
