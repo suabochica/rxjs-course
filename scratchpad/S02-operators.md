@@ -800,4 +800,53 @@ Lastly, we use the `distinctUntilChanged` operator to validate that the emitted 
 
 Now we have the basis to send the request of the search. Time to see what would be the best operator to this cases. The previous higher map operators are not a good choice, the give us a clue to check the `switchMap` operator.
 
+- [debounceTime Documentation](http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#instance-method-debounceTime)
+- [distinctUntilChanged Documentation](http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#instance-method-distinctUntilChanged)
+
 ## Finishing the Search Typehead
+Before continue, lets abstract the logic to load the lessons in a method that could be called from the `ngAfterViewInit`. This implies that we have to set the `courseId` value as a global variable of the component. The changes of the code inside the `CourseComponent` is below.
+
+```ts
+export class CourseComponent implements OnInit, AfterViewInit {
+    courseId: Number;
+    course$: Observable<Course>;
+    lessons$: Observable<Lesson[]>;
+
+    @ViewChild('searchInput', { static: true }) input: ElementRef;
+
+    constructor(private route: ActivatedRoute) {
+
+    }
+
+    ngOnInit() {
+      this.courseId = this.route.snapshot.params['id'];
+      this.course$ = createHttpObservable(`/api/courses/${this.courseId}`);
+    }
+
+    ngAfterViewInit() {
+      const searchLessons$ = fromEvent<any>(this.input.nativeElement, 'keyup')
+        .pipe(
+          map(event => event.target.value),
+          debounceTime(400),
+          distinctUntilChanged(),
+          switchMap(search => this.loadLessons(search))
+        );
+
+        const initialLessons$ = this.loadLessons();
+        concat(initialLessons$, searchLessons$);
+    }
+
+    loadLessons(search = ''): Observable<Lesson[]> {
+      return createHttpObservable(
+        `/api/lessons?courseId=${this.courseId}&pageSize=100&filter=${search}`
+      )
+      .pipe(
+        map(response => response["payload"])
+      )
+    }
+}
+```
+
+Notice the use of the `switchMap` in the `ngAfterViewInit` method. The `switchMap` operator projects each source value to an Observable which is merged in the output Observable, emitting values only from the most recently projected Observable. This is perfect for release the search because we can interrupt the emitting values until we have the stable presentation of the word to do the search.
+
+- [switchMap Documentation](http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#instance-method-switchMap)
