@@ -69,7 +69,7 @@ export class HomeComponent implements OnInit {
 }
 ```
 
-Handling errors using the subscribe call is sometimes all we need, but this error handling approach is **limited**. Using this approach, we cannot recover from the error or emit an alternative fallback value that replace the value tah we were expecting from the backend.
+Handling errors using the subscribe call is sometimes all we need, but this error handling approach is **limited**. Using this approach, we cannot recover from the error or emit an alternative fallback value that replace the value tah we were expecting from the back-end.
 
 Let's then lear a few operators that will allow us to implement more advanced error handling strategies.
 
@@ -108,7 +108,7 @@ const http$ = this.http.get<course[]>('/api/courses');
 
 http$
   .pipe(
-    catcherror(err => of([]))
+    catchError(err => of([]))
   )
   .subscribe(
     res => console.log('http response', res),
@@ -135,7 +135,7 @@ const http$ = this.http.get<course[]>('/api/courses');
 
 http$
   .pipe(
-    catcherror(err => {
+    catchError(err => {
       console.log('Handling error locally and rethrowing it', err)
       
       return throwError(err);
@@ -156,12 +156,12 @@ For the other hand, it is important keep in mind that the `catchError` operator 
 http$
   .pipe(
     map(res => res['payload']),
-    catcherror(err => {
+    catchError(err => {
       console.log('Handling error locally and rethrowing it', err)
       
       return throwError(err);
     }), 
-    catcherror(err => {
+    catchError(err => {
       console.log('Caught rethrown error.')
       
       return of([])
@@ -174,7 +174,55 @@ http$
   );
 ```
 
+### The Finalize Operator
+Besides a catch block for handling errors, the synchronous JavaScript syntax also provides a finally block that can be used to run code that we *always* want to executed. The `finally` block is typically used for releasing expensive resources, such as for example closing down network connections or releasing memory.
 
-## The Catch and Rethrow RxJs Error Handling Strategy
+Unlike the code in the catch block, the code in the finally block will get executed independently if an error is thrown or not:
+
+```ts
+try {
+    // sync operation
+    const httpResponse = getHttpResponseSync('/api/courses');
+} catch(error){
+    // handle error, only executed in case for error
+} finally {
+  // this will always get executed
+}
+```
+
+RxJs provides us with an operator that has a similar behavior to the finally functionality, the `finalize` operator. Just like `catchError`, we can add multiple finalize calls at different places in the Observable chain if needed, in order to make sure that the multiple resources are correctly released.
+
+```ts
+http$
+  .pipe(
+    map(res => res['payload']),
+    catchError(err => {
+      console.log('Handling error locally and rethrowing it', err)
+      
+      return throwError(err);
+    }), 
+    finalize(() => console.log("first finalize block executed"))
+    catchError(err => {
+      console.log('Caught rethrown error.')
+      
+      return of([])
+    }),
+    finalize(() => console.log("second finalize block executed"));
+  )
+  .subscribe(
+    res => console.log('http response', res),
+    err => console.log('http error', err),
+    () => console.log('http request completed')
+  );
+```
+ When you run this code, you will see how the multiple finalize blocks are being executed. Pay attention that the last finalize block is executed _after_ the subscribe value handler and completion handler functions.
+ 
+### The Retry Strategy
+An alternative to rethrowing the error or providing fallback values, we can also simply _retry_ to subscribe to the errored out Observable. Let's remember, once the stream errors out we cannot recover it, but nothing prevents us from subscribing _again_ to the Observable from which the stream was derive from, and create another stream.
+
+The big question here is, _when_ are we going to subscribe again to the input Observable, and retry to execute the input stream: Immediately, with a small delay or only a limited amount of times, and then error out the output stream. To answer these questions, we going to need a second auxiliary Observable, the Notifier. The Notifier will to determine _when_ the retry attempt occurs.
+
+
+# The Catch and Rethrow RxJs Error Handling Strategy
 ## The Retry RxJs Error Handling Strategy ## The startWith RxJs Operator
 ## RxJs Throttling vs Debouncing
