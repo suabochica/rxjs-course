@@ -100,9 +100,81 @@ If an _error occurs_ then the `catchError` logic is going to kick in. The `cathE
 
 Remember that the input stream of `catchError` has error out, and according to the Observable contract, we cannot use it any more. The _replacement observable_ is then going to be subscribed to and its values are going to be used _in place_ of the error out input Observable.
 
- ### The Catch and Replace Strategy
+### The Catch and Replace Strategy
+Lets give an example of how `catchError` can be used to provide a replacement Observable that emits fallback values:
+
+```ts
+const http$ = this.http.get<course[]>('/api/courses');
+
+http$
+  .pipe(
+    catcherror(err => of([]))
+  )
+  .subscribe(
+    res => console.log('http response', res),
+    err => console.log('http error', err),
+    () => console.log('http request completed')
+  );
+```
+
+As you notice, we are passing to the `catchError` operator a function which is the error handling function. This function is not called immediately, and in general, its usually _not_ called. _Only_ when an error occurs in the input Observable of `catchError` the error handling function will be called, and, in this case the error handling function will return an Observable built using the `of([])` function. The `of()` function builds an Observable that emits only one value `([])` and then it completes. This Observable gets subscribed to by the `catchError` operator. Finally the values of the recovery Observable are then emitted as replacement values in the output Observable returned by the `catchError`.
+
+At the end result, the `http$` Observable will not error out anymore! It will print:
+
+```
+HTTP response []
+HTTP request completed
+```
+
+Here the error handling callback in the `subscribe()` is not invoked anymore. Instead, the empty array value `[]` is emitted and the `http$` Observable is then completed.
+
+Basically this is the catch and replace strategy, and we can expand it to send the error instead of an empty values, as shown below:
+
+```ts
+const http$ = this.http.get<course[]>('/api/courses');
+
+http$
+  .pipe(
+    catcherror(err => {
+      console.log('Handling error locally and rethrowing it', err)
+      
+      return throwError(err);
+    })
+  )
+  .subscribe(
+    res => console.log('http response', res),
+    err => console.log('http error', err),
+    () => console.log('http request completed')
+  );
+```
+In this case, we are simply logging the error to the console, but we could instead add any local error handling
+logic that we want, such as for example showing an error message to the user. Noe, we are then returning a replacement Observable that this time was created using `throwError`. Running this code will print the specific error in the request.
+
+For the other hand, it is important keep in mind that the `catchError` operator return an Observable, so we can use it several times, and even we can combine it with other operators.
+
+```ts
+http$
+  .pipe(
+    map(res => res['payload']),
+    catcherror(err => {
+      console.log('Handling error locally and rethrowing it', err)
+      
+      return throwError(err);
+    }), 
+    catcherror(err => {
+      console.log('Caught rethrown error.')
+      
+      return of([])
+    });
+  )
+  .subscribe(
+    res => console.log('http response', res),
+    err => console.log('http error', err),
+    () => console.log('http request completed')
+  );
+```
+
 
 ## The Catch and Rethrow RxJs Error Handling Strategy
-## The Retry RxJs Error Handling Strategy
-## The startWith RxJs Operator
+## The Retry RxJs Error Handling Strategy ## The startWith RxJs Operator
 ## RxJs Throttling vs Debouncing
