@@ -222,7 +222,16 @@ An alternative to rethrowing the error or providing fallback values, we can also
 
 The big question here is, _when_ are we going to subscribe again to the input Observable, and retry to execute the input stream: Immediately, with a small delay or only a limited amount of times, and then error out the output stream. To answer these questions, we going to need a second auxiliary Observable, the Notifier. The Notifier will to determine _when_ the retry attempt occurs.
 
+Basically, RxJs offer us operators to define each of the mentioned scenarios to subscribing to the input observable:
 
-# The Catch and Rethrow RxJs Error Handling Strategy
+- To subscribe immediately we can use `retryWhen`
+- To subscribe with a small delay we can use `delayWhen` in combination with the `timer` operator.
+
+### Conclusions
+As we have seen, understanding RxJs error handling is all about understanding the fundamentals of the Observable contract first. We need to keep in mind that any given stream can only error out _once_, and is exclusive with stream completion: _only one of the two scenarios can happen_.
+
+In order to recover from an error, the only way is to somehow generate a replacement stream as an alternative to the errored out stream, like happens in the case of `catchError` or `retryWhen` Operators.
+
+## The Catch and Rethrow RxJs Error Handling Strategy
 ## The Retry RxJs Error Handling Strategy ## The startWith RxJs Operator
 ## RxJs Throttling vs Debouncing
