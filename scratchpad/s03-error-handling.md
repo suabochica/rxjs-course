@@ -233,5 +233,47 @@ As we have seen, understanding RxJs error handling is all about understanding th
 In order to recover from an error, the only way is to somehow generate a replacement stream as an alternative to the errored out stream, like happens in the case of `catchError` or `retryWhen` Operators.
 
 ## The Catch and Rethrow RxJs Error Handling Strategy
+In order to handling error we have to force an error in the response of the HTTP request to the `/api/courses` endpoint. Let's return the error in the `get-courses.ts` file.
+
+```ts
+export function getAllCourses(req: Request, res: Response) {
+    setTimeout(() => {
+        // res.status(200).json({payload:Object.values(COURSES)});
+        res.status(500).json({ message: 'random error occurred.' });
+    }, 200);
+}
+```
+Good. Now that we have a forced the error 500 for the HTTP request and get the 'random error ocurred' message as response we have three strategies to face it:
+
+1. Catch the error and try to recover from it by for example providing and alternative value.
+2. Catch the error log in the console and rethrow it to the observable that is consuming these observable.
+3. Try again the operation just failed 
+
+Let's check the first strategy. The next code applies the definition of the first way:
+
+```ts
+  ngOnInit() {
+    const httpCourses$: Observable<Course[]> = createHttpObservable('/api/courses');
+    const courses$ = httpCourses$
+      .pipe(
+        tap(() => console.log("HTTP request")),
+        map(response => Object.values(response["payload"])),
+        shareReplay(),
+        catchError(error => of([
+          {
+            id: 0,
+            description: "RxJs In Practice Course",
+            iconUrl: 'https://s3-us-west-1.amazonaws.com/angular-university/course-images/rxjs-in-practice-course.png',
+            courseListIcon: 'https://angular-academy.s3.amazonaws.com/main-logo/main-page-logo-small-hat.png',
+            longDescription: "Understand the RxJs Observable pattern, learn the RxJs Operators via practical examples",
+            category: 'BEGINNER',
+            lessonsCount: 10
+          }
+        ]))
+      );
+```
+
+Notice that we use the `catchError` operator and with help of the `of` method we provide an alternative value, that in this case is a hard coded object of a course. In sophisticated projects you can return here the values stored in a offline database.
+
 ## The Retry RxJs Error Handling Strategy ## The startWith RxJs Operator
 ## RxJs Throttling vs Debouncing
