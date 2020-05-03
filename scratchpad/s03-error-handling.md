@@ -374,4 +374,58 @@ Good, now we have the context to apply the retry error handling strategy. The ne
 Here, we have a major detail to keep in mind. The `retryWhen` operator will receive a parameter an `errors` Observable, that will emit as values the current errors generated. At the moment to use the `retryWhen` operator we should consider when we send the observable again. In this case, we are sending the error after two seconds with help of the `delayWhen` operator and the `timer` method. We can send the try immediately, however, in practice this decision is not common because many of these requests failures are due to intermittent problems. That is why the delay is a best approach.
 
 ## The startWith RxJs Operator
+Now, let's do an improvement over the code of the `ngAfterViewInit` method inside the `course.component.ts` file, with help of the `startWith` operator. Currently the code is like:
+
+```ts
+ngAfterViewInit() {
+  const searchLessons$ = fromEvent<any>(this.input.nativeElement, 'keyup')
+    .pipe(
+      map(event => event.target.value),
+      debounceTime(400),
+      distinctUntilChanged(),
+      switchMap(search => this.loadLessons(search))
+    );
+
+  const initialLessons$ = this.loadLessons();
+  this.lessons$ = concat(initialLessons$, searchLessons$);
+}
+
+loadLessons(search = ''): Observable<Lesson[]> {
+  return createHttpObservable(
+    `/api/lessons?courseId=${this.courseId}&pageSize=100&filter=${search}`
+  )
+    .pipe(
+      map(response => response["payload"])
+    );
+}
+```
+
+As you can see, we first create the `searchLessons$` observable, to send the HTTP request from the `keyup` event. Next we create the `initialLessons$` observable to handle the first scenario of our search, an empty value. And finally, we use the `concat` operator to create our output observable from `searchLessons$` and `initialLessons$`.
+
+However, we can get the same result we less code, as shown below:
+
+```ts
+ngAfterViewInit() {
+  const lessons$ = fromEvent<any>(this.input.nativeElement, 'keyup')
+    .pipe(
+      map(event => event.target.value),
+      startWith(''),
+      debounceTime(400),
+      distinctUntilChanged(),
+      switchMap(search => this.loadLessons(search))
+    );
+}
+
+loadLessons(search = ''): Observable<Lesson[]> {
+  return createHttpObservable(
+    `/api/lessons?courseId=${this.courseId}&pageSize=100&filter=${search}`
+  )
+    .pipe(
+      map(response => response["payload"])
+    );
+}
+```
+
+Here, we assign directly the `fromEvent` to our `lessons$` observable and with help of the `startsWith` operator we supply the empty search scenario.
+
 ## RxJs Throttling vs Debouncing

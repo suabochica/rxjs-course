@@ -26,12 +26,12 @@
   - [X] Setting Up the Course Component
   - [X] Building a Search Typehead
   - [X] Finishing the Search Typehead
-* TODO [3/6] Chapter 3: RxJs Error Handling
+* TODO [5/6] Chapter 3: RxJs Error Handling
   - [X] RxJs Error Handling Guide
   - [X] RxJs Error Handling - The Catch and Replace Error Handling Strategy
   - [X] The Catch and Rethrow RxJs Error Handling Strategy
-  - [ ] The Retry RxJs Error Handling Strategy
-  - [ ] The startWith RxJs Operator
+  - [X] The Retry RxJs Error Handling Strategy
+  - [X] The startWith RxJs Operator
   - [ ] RxJs Throttling vs Debouncing
 * TODO [/] Chapter 4: Building a RxJs Custom Operator
   - [ ] Implementing a Custom RxJs Operator
