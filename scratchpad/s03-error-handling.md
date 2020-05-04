@@ -429,3 +429,26 @@ loadLessons(search = ''): Observable<Lesson[]> {
 Here, we assign directly the `fromEvent` to our `lessons$` observable and with help of the `startsWith` operator we supply the empty search scenario.
 
 ## RxJs Throttling vs Debouncing
+Let's review the difference between debouncing and throttling to identify what approach is better in specific cases. With debouncing, the observable waiting for the values when they are stable. Let's check the implementation of the search filter reviewed before:
+
+```ts
+fromEvent<any>(this.input.nativeElement, 'keyup')
+.pipe(
+  map(event => event.target.value),
+  debounceTime(400),
+)
+.subscribe();
+```
+
+Good, now let's review the throttle way. Basically, the `throttleTime` operator is used for limit the quantity of values emitted from the input observable. It will require as parameter the interval of time to emit the values. The next snippet shows the mentioned scenario:
+
+```ts
+fromEvent<any>(this.input.nativeElement, 'keyup')
+.pipe(
+  map(event => event.target.value),
+  throttleTime(400),
+)
+.subscribe();
+```
+
+So, for the search type head is more convenient use `debounceTime`, because we need a stable set of characters to do the search. The `throttleTime` operator is good for communication between web sockets or channels where the priority is emit values frequently.
