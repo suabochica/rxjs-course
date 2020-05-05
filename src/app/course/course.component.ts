@@ -18,7 +18,7 @@ import { merge, fromEvent, Observable, concat } from 'rxjs';
 import { createHttpObservable } from '../common/util';
 import { Lesson } from '../model/lesson';
 import { response } from 'express';
-import { debug } from '../common/debug';
+import { debug, RxJsLoggingLevel, setRxJsLoggingLevel } from '../common/debug';
 
 
 @Component({
@@ -33,13 +33,16 @@ export class CourseComponent implements OnInit, AfterViewInit {
 
   @ViewChild('searchInput', { static: true }) input: ElementRef;
 
-  constructor(private route: ActivatedRoute) {
-
-  }
+  constructor(private route: ActivatedRoute) { }
 
   ngOnInit() {
     this.courseId = this.route.snapshot.params['id'];
-    this.course$ = createHttpObservable(`/api/courses/${this.courseId}`);
+    this.course$ = createHttpObservable(`/api/courses/${this.courseId}`)
+      .pipe(
+        debug(RxJsLoggingLevel.INFO, "course value"),
+      );
+
+    setRxJsLoggingLevel(RxJsLoggingLevel.DEBUG)
   }
 
   ngAfterViewInit() {
@@ -50,7 +53,8 @@ export class CourseComponent implements OnInit, AfterViewInit {
         debug(RxJsLoggingLevel.INFO, "search"),
         debounceTime(400),
         distinctUntilChanged(),
-        switchMap(search => this.loadLessons(search))
+        switchMap(search => this.loadLessons(search)),
+        debug(RxJsLoggingLevel.INFO, "lessons value")
       );
   }
 
