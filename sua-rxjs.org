@@ -26,20 +26,22 @@
   - [X] Setting Up the Course Component
   - [X] Building a Search Typehead
   - [X] Finishing the Search Typehead
-* TODO [6/6] Chapter 3: RxJs Error Handling
+* DONE [6/6] Chapter 3: RxJs Error Handling
+  CLOSED: [2020-05-06 Wed 08:35]
   - [X] RxJs Error Handling Guide
   - [X] RxJs Error Handling - The Catch and Replace Error Handling Strategy
   - [X] The Catch and Rethrow RxJs Error Handling Strategy
   - [X] The Retry RxJs Error Handling Strategy
   - [X] The startWith RxJs Operator
   - [X] RxJs Throttling vs Debouncing
-* TODO [/] Chapter 4: Building a RxJs Custom Operator
-  - [ ] Implementing a Custom RxJs Operator
-  - [ ] The RxJs Debug Operator
-  - [ ] The RxJs forkjoin Operator
-* TODO [/] Chapter 5. RxJs Subjects and the Store Pattern
-  - [ ] Subjects and Stores
-  - [ ] What are RxJs Subjects
+* DONE [3/3] Chapter 4: Building a RxJs Custom Operator
+  CLOSED: [2020-05-03 Sun 08:35]
+  - [X] Implementing a Custom RxJs Operator
+  - [X] The RxJs Debug Operator
+  - [X] The RxJs forkjoin Operator
+* TODO [2/10] Chapter 5. RxJs Subjects and the Store Pattern
+  - [X] Subjects and Stores
+  - [X] What are RxJs Subjects
   - [ ] BehaviorSubject in Detail
   - [ ] AsyncSubject and ReplaySubject
   - [ ] Store Service Design
