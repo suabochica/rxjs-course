@@ -39,6 +39,48 @@ ngOnInit() {
 Note that after define the subject we use the method `asObservable` to determine that our subject will be a observable. Then we can use the `next` and the `complete` methods of the observable.
 
 ## BehaviorSubject
+The `BehaviorSubject` share the same principle of the `Subject` but has specific features the made it a little bit different. Let's check the next code sample to understand the distinction between `BehaviorSubject` and `Subject`:
+
+```ts
+    const subject = new Subject();
+    const series$ = subject.asObservable();
+
+    series$.subscribe(value => console.log(`early sub: ${value}`));
+
+    subject.next(1);
+    subject.next(2);
+    subject.next(3);
+    // subject.complete();
+
+    setTimeout(() => {
+      series$.subscribe(value => console.log(`late sub: ${value}`));
+      subject.next(4)
+    }, 3000)
+```
+Here, we are doing an early subscription and a late subscription. When you check the console you will see the for the early subscription we have all th values (1, 2, 3, 4) and for the late subscription we just have the 4 value. In other words, the late subscription is not aware of the values in the early subscription, this means that the `Subject` is not have memory.
+
+Now lets check the example using the `BehaviorSubject`:
+
+```ts
+    const subject = new BehaviorSubject(0);
+    const series$ = subject.asObservable();
+
+    series$.subscribe(value => console.log(`early sub: ${value}`));
+
+    subject.next(1);
+    subject.next(2);
+    subject.next(3);
+    // subject.complete();
+
+    setTimeout(() => {
+      series$.subscribe(value => console.log(`late sub: ${value}`));
+      subject.next(4)
+    }, 3000)
+```
+Several key points on this case. First, check that the `BehaviorSubject` receive as parameter a 0. This is required because the `BehaviorSubject` should initialize the observable with a value. Second, with this modification, when you check the console you will see that for the early subscription we have all the values again, and for the late subscription we got 3 and 4. The `BehaviorSubject` allow us to get the last value of a previous subscription.
+
+Lastly, check that in both example we comment the `subject.complete` line. This is intentional, because if the subject is complete we cannot subscribe to the observable after the complete state.
+
 ## AsyncSubject and Replay Subject
 ## Store Service Design
 ## The Store Pattern

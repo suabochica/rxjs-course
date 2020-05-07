@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { noop, concat, pipe, of, merge, interval, Subject } from 'rxjs';
+import { noop, concat, pipe, of, merge, interval, Subject, BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { createHttpObservable } from '../common/util';
 
@@ -46,14 +46,36 @@ export class AboutComponent implements OnInit {
 
     // Explaining subject
     // ---------------------------------
-    const subject = new Subject();
+    // const subject = new Subject();
+    // const series$ = subject.asObservable();
+
+    // series$.subscribe(value => console.log(`early sub: ${value}`));
+
+    // subject.next(1);
+    // subject.next(2);
+    // subject.next(3);
+    // // subject.complete();
+
+    // setTimeout(() => {
+    //   series$.subscribe(value => console.log(`late sub: ${value}`));
+    //   subject.next(4)
+    // }, 3000)
+
+    // Explaining behavior subject
+    // ---------------------------------
+    const subject = new BehaviorSubject(0);
     const series$ = subject.asObservable();
 
-    series$.subscribe(console.log);
+    series$.subscribe(value => console.log(`early sub: ${value}`));
 
     subject.next(1);
     subject.next(2);
     subject.next(3);
-    subject.complete();
+    // subject.complete();
+
+    setTimeout(() => {
+      series$.subscribe(value => console.log(`late sub: ${value}`));
+      subject.next(4)
+    }, 3000)
   };
 }
