@@ -82,6 +82,53 @@ Several key points on this case. First, check that the `BehaviorSubject` receive
 Lastly, check that in both example we comment the `subject.complete` line. This is intentional, because if the subject is complete we cannot subscribe to the observable after the complete state.
 
 ## AsyncSubject and Replay Subject
+Let's check two new `Subject` alternatives
+
+### Async Subject
+The `AsyncSubject` is ideal for using with long running calculations where the observable is emitting a lot of intermediate calculation values but for us it is important get the finished calculation value. It means that we want to get the last value emitted by the subject before the subject is going to be completed.
+
+Let's check the next snippet:
+
+```ts
+    const subject = new AsyncSubject();
+    const series$ = subject.asObservable();
+
+    series$.subscribe(value => console.log(`first sub: ${value}`));
+
+    subject.next(1);
+    subject.next(2);
+    subject.next(3);
+    subject.complete();
+
+    setTimeout(() => {
+      series$.subscribe(value => console.log(`second sub: ${value}`));
+    }, 3000)
+```
+
+When we check the console we get for both subscription the 3 value. that is the last value before the subject will completed. It is important to highlight that the `AsyncSubject` just works if the subject is completed. Otherwise, we never will get the values from the subject
+
+### Replay Subject
+The `ReplaySubject` will give us all the values in each subscription, and it _not_ depends to the subject completion. Check to code below:
+
+```ts
+    const subject = new ReplaySubject();
+    const series$ = subject.asObservable();
+
+    series$.subscribe(value => console.log(`first sub: ${value}`));
+
+    subject.next(1);
+    subject.next(2);
+    subject.next(3);
+    // subject.complete();
+
+    setTimeout(() => {
+      series$.subscribe(value => console.log(`second sub: ${value}`));
+      subject.next(4)
+    }, 3000)
+```
+
+When we check the console, we see that for both subscriptions we will get all the values (1, 2, 3) initially and then after three seconds we got the 4.
+
 ## Store Service Design
 ## The Store Pattern
 ## BehaviorSubject Store
