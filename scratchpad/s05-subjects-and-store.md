@@ -130,6 +130,45 @@ The `ReplaySubject` will give us all the values in each subscription, and it _no
 When we check the console, we see that for both subscriptions we will get all the values (1, 2, 3) initially and then after three seconds we got the 4.
 
 ## Store Service Design
+Now let's introduce a store service service wit help of subjects by implementing a very common design pattern web application: _centralize store service_.
+
+Currently, the design in the home component, we had that every time that we navigate toward the route of the home component we are trigger a new HTTP request to fetch the course data from the back-end.
+
+We are aware that the data did not change, so a good approach is after fetching the data from the back-end we should kept it in the client memory to avoid make duplicated HTTP request for the same endpoint. The goal is store the data in the client side independently of the component, so, whenever the home component gets the data should consume it from the store. The centralize store service will help us with this goal, exposing the data as Observable and make the back-end request in the appropriate moment.
+
+The next snippet is a definition of the store:
+
+```ts
+import { Injectable } from "@angular/core";
+import { BehaviorSubject, Observable } from "rxjs";
+import { Course } from "../model/course";
+
+@Injectable({
+    providedIn: 'root'
+})
+export class Store {
+    private subject = new BehaviorSubject<Course[]>([]);
+    courses$: Observable<Course[]> = this.subject.asObservable()
+}
+```
+
+Note that we are using the `@Injectable` decorator to enable the store at root level. That means that the store is available for any component.
+On the other hand, check that we are using the `BehaviorSubject` instead of a `Observable.create`, because it is important for the application that the late subscribers to the observable also gets the latest emitted values.
+
+For example, when the user navigate throughout the application going to the about screen to the courses screen, we will have each time new instances of the home component, since the component gets destroyed an recreated as we navigate back to the course route. So we want that the later instances of the component also gets the course's data.
+
+Now, lets check how consume the store:
+
+```ts
+export class HomeComponent implements OnInit {
+
+  constructor(private store: Store) {
+    
+  }
+}
+```
+As store is provided a root level, we can consume it in the constructor function of the component passing it as parameter.
+
 ## The Store Pattern
 ## BehaviorSubject Store
 ## Refactoring the Course Component Using Store

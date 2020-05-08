@@ -39,12 +39,12 @@
   - [X] Implementing a Custom RxJs Operator
   - [X] The RxJs Debug Operator
   - [X] The RxJs forkjoin Operator
-* TODO [2/10] Chapter 5. RxJs Subjects and the Store Pattern
+* TODO [5/10] Chapter 5. RxJs Subjects and the Store Pattern
   - [X] Subjects and Stores
   - [X] What are RxJs Subjects
-  - [ ] BehaviorSubject in Detail
-  - [ ] AsyncSubject and ReplaySubject
-  - [ ] Store Service Design
+  - [X] BehaviorSubject in Detail
+  - [X] AsyncSubject and ReplaySubject
+  - [X] Store Service Design
   - [ ] The Store Pattern
   - [ ] BehaviorSubject Store
   - [ ] Refactoring the Course Component for Using Store
