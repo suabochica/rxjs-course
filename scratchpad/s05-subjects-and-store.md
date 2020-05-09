@@ -170,7 +170,95 @@ export class HomeComponent implements OnInit {
 As store is provided a root level, we can consume it in the constructor function of the component passing it as parameter.
 
 ## The Store Pattern
+To continue with the implementation of the store, we will start by filling out the store with the courses data. The appropriate moment to make the request to the back-end is when we start the application. So let's consume our store from the `app.component.ts` file:
+
+```ts
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent implements OnInit {
+  title = 'app';
+
+  constructor(private store: Store) {
+  }
+
+  ngOnInit() {
+    this.store.init();
+  }
+}
+```
+
+Note that we are calling `this.store.init` method. So, the next step is define what will to do the `init` method of the store. Here is the common place to create our HTTP observable, and take away this logic from the component by itself. The next snippet consolidate our `Store` service:
+
+```ts
+export class Store {
+    private subject = new BehaviorSubject<Course[]>([]);
+    courses$: Observable<Course[]> = this.subject.asObservable()
+
+    init() {
+        const httpCourses$: Observable<Course[]> = createHttpObservable('/api/courses');
+
+        httpCourses$
+            .pipe(
+                tap(() => console.log("HTTP request")),
+                map(response => Object.values(response["payload"])),
+            )
+            .subscribe(
+                courses => this.subject.next(courses)
+            );
+    }
+
+    selectBeginnerCourses() {
+        return this.filterByCategory('BEGINNER');
+    }
+
+    selectAdvancedCourses() {
+        return this.filterByCategory('ADVANCED');
+    }
+
+    filterByCategory(category: string) {
+        return this.courses$
+            .pipe(
+                map(courses => courses.filter(course => course.category === category))
+              );
+
+    }
+}
+```
+
+Good, now we are fetch the data from the `init` method of our store. Moreover, check that we define method helpers to filter the courses according the category. Thanks to this helpers the `home.component.ts` will be:
+
+```ts
+@Component({
+  selector: 'home',
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.css']
+})
+
+export class HomeComponent implements OnInit {
+  beginnerCourses$: Observable<Course[]>;
+  advancedCourses$: Observable<Course[]>;
+
+  constructor(private store: Store) {
+
+  }
+
+  ngOnInit() {
+    const courses$ = this.store.courses$;
+
+    this.beginnerCourses$ = this.store.selectBeginnerCourses();
+    this.advancedCourses$ = this.store.selectAdvancedCourses();
+  }
+}
+```
+
+Much simpler! That is one of the benefits of use the store pattern. Now our components just have to consume the data in the store.
+
 ## BehaviorSubject Store
+```ts
+```
 ## Refactoring the Course Component Using Store
 ## Forcing the Completion of Long Running Observable
 ## The withLatestFrom RxJs Operator
