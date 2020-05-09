@@ -153,6 +153,7 @@ export class Store {
 ```
 
 Note that we are using the `@Injectable` decorator to enable the store at root level. That means that the store is available for any component.
+
 On the other hand, check that we are using the `BehaviorSubject` instead of a `Observable.create`, because it is important for the application that the late subscribers to the observable also gets the latest emitted values.
 
 For example, when the user navigate throughout the application going to the about screen to the courses screen, we will have each time new instances of the home component, since the component gets destroyed an recreated as we navigate back to the course route. So we want that the later instances of the component also gets the course's data.
@@ -235,7 +236,7 @@ Good, now we are fetch the data from the `init` method of our store. Moreover, c
   selector: 'home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
-})
+}) 
 
 export class HomeComponent implements OnInit {
   beginnerCourses$: Observable<Course[]>;
@@ -256,9 +257,66 @@ export class HomeComponent implements OnInit {
 
 Much simpler! That is one of the benefits of use the store pattern. Now our components just have to consume the data in the store.
 
-## BehaviorSubject Store
-```ts
+## Data Modification via Store
+Some lessons ago, we reviewed a scenario in the application where we did changes in the information of a course using the `course-dialog.component.ts`. In this first approach, we did the PUT HTTP request to modify the data directly in the component. Let's fit these context under the store pattern. 
+
+First of all, we have to associate a save method from save button that confirm the modification of the course info. Next markup let us attach the method to the click event in the `course-dialog.component.html` file.
+
+```html
+<mat-dialog-actions>
+    <button class="mat-raised-button"
+            (click)="close()">
+        Close
+    </button>
+    <button class="mat-raised-button mat-primary" #saveButton (click)="save()">
+        Save
+    </button>
+</mat-dialog-actions>
 ```
+
+Now, we will use this save method to call the store from our component. Remember that one of the purposes of the store service is reduce the responsibilities of the components. So the code in the `course-dialog.component.ts` file will:
+
+```ts
+    save() {
+      this.store.saveCourse(this.course.id, this.form.value)
+        .subscribe(
+          () => this.close(),
+          error => console.log("Error saving course", error)
+        );
+    }
+```
+
+Note that the `saveCourse` will receive two parameters; the id of the course that will be updated, and the values established in the form. Afterwards, we subscribe to this subject handled from the store, then, we close the observable in the complete state, and if we get an error we will print it in the console.
+
+Now all the burden to modify the data relies on the `saveCourse` method of the store, let's review his implementation:
+
+```ts
+    saveCourse(courseId: number, changes): Observable<any> {
+        const courses = this.subject.getValue();
+        const courseIndex = courses.findIndex(course => course.id === courseId);
+        const newCourses = courses.slice(0);
+
+        newCourses[courseIndex] = {
+            ...courses[courseIndex],
+            ...changes
+        };
+
+        this.subject.next(newCourses);
+
+        return fromPromise(fetch(`/api/courses.${courseId}`, {
+            method: PUT,
+            body: JSON.stringify(changes),
+            headers: {
+                'content-type': 'application'
+            }
+        }));
+    }
+```
+
+Several thing happens here. First we get the courses from the subject. Second, we get the index of the course that will be updated, and parallel we create a `newCourses` array with help of the `slice` method.
+
+Then, we modify the new courses array applying the changes to the element that match with the course index. We use the spread operator to fit the array. Later we pass the new array to the `next` method of the subject. Finally, we return an observable using the `fromPromise` method to send the PUT HTTP request.
+
 ## Refactoring the Course Component Using Store
 ## Forcing the Completion of Long Running Observable
 ## The withLatestFrom RxJs Operator
