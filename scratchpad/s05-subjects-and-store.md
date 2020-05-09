@@ -318,5 +318,47 @@ Several thing happens here. First we get the courses from the subject. Second, w
 Then, we modify the new courses array applying the changes to the element that match with the course index. We use the spread operator to fit the array. Later we pass the new array to the `next` method of the subject. Finally, we return an observable using the `fromPromise` method to send the PUT HTTP request.
 
 ## Refactoring the Course Component Using Store
+Time to fit the `course.component.ts` to the store service pattern. Let's check the modifications in the code:
+
+```ts
+export class CourseComponent implements OnInit, AfterViewInit {
+    courseId: string;
+    course$: Observable<Course>;
+    lessons$: Observable<Lesson[]>;
+
+    @ViewChild('searchInput', { static: true }) input: ElementRef;
+
+    constructor(private route: ActivatedRoute, private store: Store) { }
+
+    ngOnInit() {
+        this.courseId = this.route.snapshot.params['id'];
+        const course$ = this.store.selectCourseById(this.courseId);
+        const lessons$ = this.loadLessons();
+
+        forkJoin(course$, lessons$)
+        .pipe(
+            tap(([course, lessons]) => {
+            console.log('course', course);
+            console.log('lessons', lessons);
+            })
+        )
+        .subscribe();
+    }
+```
+
+So, again we first have to inject the store in the constructor of the component. Now in the `ngOnInit` method we get the course from the `selectCourseById` method in the store. Let's check this filter method.
+
+```ts
+    selectCourseById(courseId: number) {
+        return this.courses$
+            .pipe(
+                map(courses => courses.find(course => course.id === courseId))
+            );
+    }
+```
+
+This function is very similar to the `selectBeginnerCourses`, instead of use the `filter` array function we sue the `find` an the criteria is the `courseId`. An important detail to highlight in the `course.component.ts` is that here we set the HTTP request to load the lessons directly in the component instead of put it in the store. The reason is because the search functionality have a high rate change, so it is not a candidate to be handled from the store.
+
 ## Forcing the Completion of Long Running Observable
+
 ## The withLatestFrom RxJs Operator
