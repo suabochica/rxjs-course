@@ -360,5 +360,54 @@ So, again we first have to inject the store in the constructor of the component.
 This function is very similar to the `selectBeginnerCourses`, instead of use the `filter` array function we sue the `find` an the criteria is the `courseId`. An important detail to highlight in the `course.component.ts` is that here we set the HTTP request to load the lessons directly in the component instead of put it in the store. The reason is because the search functionality have a high rate change, so it is not a candidate to be handled from the store.
 
 ## Forcing the Completion of Long Running Observable
+One particular function of the Observable generate by the subject and lives in the store is that this Observable never completes. This will be a problem if we want to use operators that depends of the complete state of the Observable, like `forkJoin`. If we try to use this operator we can't use it as expected.
+
+```ts
+
+    ngOnInit() {
+        this.courseId = this.route.snapshot.params['id'];
+        const course$ = this.store.selectCourseById(this.courseId);
+        const lessons$ = this.loadLessons();
+
+        forkJoin(course$, lessons$)
+        .subscribe(console.log); // operator don't log anything
+    }
+```
+
+To fix this scenario we can use the `first` operator to force the completion of the Observable. Principally, the `first` operator will complete the Observable with the first value in the observable. Before to use it, we have to fit the `selectCourseById` method in our store service just to validate that the method will return a value:
+
+```ts
+    selectCourseById(courseId: number) {
+        return this.courses$
+            .pipe(
+                map(courses => courses.find(course => course.id === courseId)),
+                filter(course => !!course)
+            );
+    }
+```
+
+Above, we use the `filter` method to check that the course values have at least one values with help of the `!!` type coercion operator of JavaScript. Now in our component we can use the `first` operator:
+
+```ts
+    ngOnInit() {
+        this.courseId = this.route.snapshot.params['id'];
+        const course$ = this.store.selectCourseById(this.courseId)
+            .pipe(
+                first()
+            );
+        const lessons$ = this.loadLessons();
+
+        forkJoin(course$, lessons$)
+        .pipe(
+            tap(([course, lessons]) => {
+            console.log('course', course);
+            console.log('lessons', lessons);
+            })
+        )
+        .subscribe();
+    }
+```
+
+Now our `forkJoin` method works as expected. Sometimes, we need to complete the Observable with a different value of the first one. For that case we can use the `take` operator which receive as parameter the position of the value with we want to complete the Observable. So if we declare `take(3)` the Observable will be completed with the third value in the stream.
 
 ## The withLatestFrom RxJs Operator
