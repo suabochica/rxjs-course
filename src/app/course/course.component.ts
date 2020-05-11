@@ -41,20 +41,32 @@ export class CourseComponent implements OnInit, AfterViewInit {
 
     ngOnInit() {
         this.courseId = this.route.snapshot.params['id'];
-        const course$ = this.store.selectCourseById(this.courseId)
-            .pipe(
-                first()
-            );
-        const lessons$ = this.loadLessons();
+        const course$ = this.store.selectCourseById(this.courseId);
 
-        forkJoin(course$, lessons$)
-        .pipe(
-            tap(([course, lessons]) => {
-            console.log('course', course);
-            console.log('lessons', lessons);
-            })
-        )
-        .subscribe();
+        // forkJoin Explanation
+        // ---------------------
+
+        // const lessons$ = this.loadLessons();
+
+        // forkJoin(course$, lessons$)
+        // .pipe(
+        //     tap(([course, lessons]) => {
+        //     console.log('course', course);
+        //     console.log('lessons', lessons);
+        //     })
+        // )
+        // .subscribe();
+
+        // withLatestFrom Explanation
+        // ---------------------
+        this.loadLessons()
+            .pipe(
+                withLatestFrom(this.course$)
+            )
+            .subscribe(([lessons, course]) => {
+                console.log('course', course);
+                console.log('lessons', lessons);
+            });
     }
 
     ngAfterViewInit() {

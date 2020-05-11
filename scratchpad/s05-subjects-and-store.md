@@ -411,3 +411,26 @@ Above, we use the `filter` method to check that the course values have at least 
 Now our `forkJoin` method works as expected. Sometimes, we need to complete the Observable with a different value of the first one. For that case we can use the `take` operator which receive as parameter the position of the value with we want to complete the Observable. So if we declare `take(3)` the Observable will be completed with the third value in the stream.
 
 ## The withLatestFrom RxJs Operator
+The last operator to review to work with the long value Observable that purpose the store service pattern is the `withLatestFrom`. Basically, this operator combines the source Observable with the output Observable to create a new Observable whose values are calculated from the latest values of each, only when the source emits.
+
+For our case, lets combine the lessons Observable with the course Observable via `withLatestFrom`. Check the code below.
+
+```ts
+    ngOnInit() {
+        this.courseId = this.route.snapshot.params['id'];
+        const course$ = this.store.selectCourseById(this.courseId);
+
+        this.loadLessons()
+            .pipe(
+                withLatestFrom(this.course$)
+            )
+            .subscribe(([lessons, course]) => {
+                console.log('course', course);
+                console.log('lessons', lessons);
+            });
+    }
+```
+
+For detailed information  about the `withLatestFrom`, please review the official documentation.
+
+- [withLatestFrom](https://rxjs-dev.firebaseapp.com/api/operators/withLatestFrom)
