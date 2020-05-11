@@ -13,7 +13,7 @@ import {
     map,
     concatMap,
     switchMap,
-    withLatestFrom,
+    withLatesFrom,
     concatAll,
     shareReplay
 } from 'rxjs/operators';
@@ -61,7 +61,7 @@ export class CourseComponent implements OnInit, AfterViewInit {
         // ---------------------
         this.loadLessons()
             .pipe(
-                withLatestFrom(this.course$)
+                withLatesFrom(this.course$)
             )
             .subscribe(([lessons, course]) => {
                 console.log('course', course);

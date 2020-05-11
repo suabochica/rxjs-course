@@ -39,7 +39,8 @@
   - [X] Implementing a Custom RxJs Operator
   - [X] The RxJs Debug Operator
   - [X] The RxJs forkjoin Operator
-* TODO [7/10] Chapter 5. RxJs Subjects and the Store Pattern
+* DONE [10/10] Chapter 5. RxJs Subjects and the Store Pattern
+  CLOSED: [2020-05-10 Sun 15:46]
   - [X] Subjects and Stores
   - [X] What are RxJs Subjects
   - [X] BehaviorSubject in Detail
@@ -47,10 +48,11 @@
   - [X] Store Service Design
   - [X] The Store Pattern
   - [X] BehaviorSubject Store
-  - [ ] Refactoring the Course Component for Using Store
-  - [ ] Forcing the Completion of Long Running Observables
-  - [ ] The withLatestFrom RxJs Operator
-* TODO [/] Chapter 6: Conclusion
-  - [ ] Other Courses
-  - [ ] Bonus Lecture
-  - [ ] RxJs In Practice and the Key Takeaways
+  - [X] Refactoring the Course Component for Using Store
+  - [X] Forcing the Completion of Long Running Observables
+  - [X] The withLatestFrom RxJs Operator
+* DONE [3/3] Chapter 6: Conclusion
+  CLOSED: [2020-05-11 Mon 15:46]
+  - [X] Other Courses
+  - [X] Bonus Lecture
+  - [X] RxJs In Practice and the Key Takeaways
